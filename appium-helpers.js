@@ -15,6 +15,19 @@ var staticTextElement = function(staticText, timeOut, pollInterval) {
   }
 };
 
+// Use native Instruments for finding elements in iOS
+var iosWaitElement = function(staticTexts, timeOut, pollInterval) {
+  if(process.env.APPIUM_PLATFORM == "ios") {
+    return this
+      .waitForElementByIosUIAutomation('UIATarget.localTarget()\
+                                        .frontMostApp()\
+                                        .mainWindow()\
+                                        .buttons()["'staticText'"]',
+                                        timeOut, pollInterval);
+  }
+
+};
+
 // Collect certain messages from log
 var messagesFromLog = function(logType, regexFilter) {
   return this
