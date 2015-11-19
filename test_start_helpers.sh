@@ -26,9 +26,9 @@ function start_script {
   npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
   MOCHA_BIN='./node_modules/.bin/mocha'
-  
+
   echo "Running tests '$TEST'"
-  if [ "$TESTDROID" -eq "1" ]; then
+  if [ "$TESTDROID" == "1" ]; then
     ${MOCHA_BIN} "${TEST}" --reporter mocha-junit-reporter --reporter-options mochaFile=./TEST-all.xml 2>&1
   else
     ${MOCHA_BIN} "$TEST"
