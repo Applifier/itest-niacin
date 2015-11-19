@@ -22,8 +22,12 @@ var iosWaitElement = function(staticTexts, timeOut, pollInterval) {
       .waitForElementByIosUIAutomation('UIATarget.localTarget()\
                                         .frontMostApp()\
                                         .mainWindow()\
-                                        .buttons()["'staticText'"]',
+                                        .buttons()["' +staticText+ '"]',
                                         timeOut, pollInterval);
+  }
+  else {
+    return this
+      .waitForElementByName(staticText, timeOut, pollInterval);
   }
 
 };
