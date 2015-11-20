@@ -1,6 +1,15 @@
 #!/bin/bash
 # Helpers for commandline scripts related to appium tests.
 
+# Take a screenshot from connected android device into a child-folder named 'screenshots'
+# Arg1: screenshot filename
+function take_screenshot {
+  adb shell screencap -p "/sdcard/screencap.png" &&
+  adb pull "/sdcard/screencap.png" &&
+  mkdir "screenshots"
+  mv screencap.png "screenshots/$1"
+}
+
 function get_full_path {
   echo "$( cd "$(dirname "$1")"; echo "$(pwd)/$(basename "$1")" )"
 }
