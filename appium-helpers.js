@@ -15,6 +15,23 @@ var staticTextElement = function(staticText, timeOut, pollInterval) {
   }
 };
 
+// Use native Instruments for finding elements in iOS
+var iosWaitElement = function(staticText, timeOut, pollInterval) {
+  if(process.env.APPIUM_PLATFORM == "ios") {
+    return this
+      .waitForElementByIosUIAutomation('UIATarget.localTarget()\
+                                        .frontMostApp()\
+                                        .mainWindow()\
+                                        .buttons()["' +staticText+ '"]',
+                                        timeOut, pollInterval);
+  }
+  else {
+    return this
+      .waitForElementByName(staticText, timeOut, pollInterval);
+  }
+
+};
+
 // Collect certain messages from log
 var messagesFromLog = function(logType, regexFilter) {
   return this
@@ -59,6 +76,7 @@ var logContexts = function(tagStr){
 
 exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('staticTextElement', staticTextElement);
+  wd.addPromiseChainMethod('iosWaitElement', iosWaitElement);
   wd.addPromiseChainMethod('messagesFromLog', messagesFromLog);
   wd.addPromiseChainMethod('jsonObjectsFromLog', jsonObjectsFromLog);
   wd.addPromiseChainMethod('logContexts', logContexts);
@@ -66,6 +84,7 @@ exports.configureWd = function(wd) {
 
 exports.configureYiewdDriver = function(driver){
   driver.staticTextElement = staticTextElement;
+  driver.iosWaitElement = iosWaitElement;
   driver.messagesFromLog = messagesFromLog;
   driver.jsonObjectsFromLog = jsonObjectsFromLog;
   driver.logContexts = logContexts;
