@@ -26,5 +26,5 @@ if [ "$passCount" == "0" ]; then
 	export SLACK_STATUS_ICON=":warning:"
 fi
 
-SLACK_MESSAGE="$JOB_NAME results: Passed: $passCount, Failed: $failCount, skipped: $skipCount. Results at: $BUILD_URL"
+export SLACK_MESSAGE="$JOB_NAME results: Passed: $passCount, Failed: $failCount, skipped: $skipCount. Results at: $BUILD_URL"
 ./slack.sh
