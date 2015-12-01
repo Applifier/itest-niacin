@@ -24,8 +24,6 @@ fi
 
 if [ "$passCount" == "0" ]; then
 	export SLACK_STATUS_ICON=":warning:"
-else 
-	export SLACK_STATUS_ICON=":vaultboy:"
 fi
 
 SLACK_MESSAGE="$JOB_NAME results: Passed: $passCount, Failed: $failCount, skipped: $skipCount. Results at: $BUILD_URL"
