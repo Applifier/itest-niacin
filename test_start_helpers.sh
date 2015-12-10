@@ -10,6 +10,40 @@ function take_screenshot {
   mv screencap.png "screenshots/$1"
 }
 
+# Take $1 screenshots and save them to file ${2}[0..n].png. The files will then
+# need to be pulled using pull_screenshot_batch
+function batch_screenshot {
+  _PREFIX="screencap"
+
+  if [ "$2" != "" ]; then
+    _PREFIX=$2
+  fi
+
+  for (( i=0; i < $1; ++i ))
+  do
+    adb shell screencap -p "/sdcard/${_PREFIX}${i}.png"
+  done
+}
+
+# Pull $1 screenshots from device and save them to local dir screenshots/. The
+# naming convention and ordering of the files is determined in the same way as
+# when executing burst_screenshot.
+function pull_screenshot_batch {
+  _PREFIX="screencap"
+
+  if [ "$2" != "" ]; then
+    _PREFIX=$2
+  fi
+
+  mkdir "screenshots"
+
+  for (( i=0; i < $1; ++i ))
+  do
+    adb pull "/sdcard/${_PREFIX}${i}.png"
+    mv ${_PREFIX}${i}.png "screenshots/${_PREFIX}${i}.png"
+  done
+}
+
 function get_full_path {
   echo "$( cd "$(dirname "$1")"; echo "$(pwd)/$(basename "$1")" )"
 }
