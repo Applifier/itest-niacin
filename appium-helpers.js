@@ -1,5 +1,8 @@
 /* jshint node: true, multistr: true */
 
+var exec = require('child_process').exec,
+  mkdirp = require("mkdirp");
+
 // The buttons on the ad screen cannot be recognized by same appium methods
 // on iOS as on Android, Use this method instead.
 var staticTextElement = function(staticText, timeOut, pollInterval) {
@@ -74,12 +77,53 @@ var logContexts = function(tagStr){
     });
 }
 
+var screenShotLoop = function(fileName, index, max, cb){
+  console.log("asked to screenshot '" + fileName + index + "', upto '" + max + "'");
+  if(index >= max){
+    cb();
+  } else {
+
+    exec("adb shell screencap -p \"/sdcard/" + fileName + index + ".png\"", function(){
+      var nextIndex = index + 1;
+      screenShotLoop(fileName, nextIndex, max, cb)
+    });
+  }
+}
+
+var burstScreenshot = function(fileName, photosCount){
+  screenShotLoop(fileName, 1, photosCount, function(){
+    return;
+  });
+}
+
+var pullFileLoop = function(fileName, dest, index, max, cb){
+  console.log("asked to pull '" + fileName + index + "', upto '" + max + "'");
+  if(index >= max){
+    cb();
+  } else {
+    exec("adb pull '/sdcard/" + fileName + index + ".png' " + dest + "", function(){
+      nextIndex = index + 1;
+      pullFileLoop(fileName, dest, nextIndex, max, cb);
+    });
+  }
+}
+
+var pullBursts = function(fileName, dest, photosCount){
+  var index = 1;
+  mkdirp(dest);
+  pullFileLoop(fileName, dest, index, photosCount, function(){
+    return;
+  });
+}
+
 exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('staticTextElement', staticTextElement);
   wd.addPromiseChainMethod('iosWaitElement', iosWaitElement);
   wd.addPromiseChainMethod('messagesFromLog', messagesFromLog);
   wd.addPromiseChainMethod('jsonObjectsFromLog', jsonObjectsFromLog);
   wd.addPromiseChainMethod('logContexts', logContexts);
+  wd.addPromiseChainMethod('burstScreenshot', burstScreenshot);
+  wd.addPromiseChainMethod('pullBursts', pullBursts);
 };
 
 exports.configureYiewdDriver = function(driver){
