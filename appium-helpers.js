@@ -75,26 +75,26 @@ var logContexts = function(tagStr){
       console.log("Visible contexts at " + tagStr + ": " + contexts);
       return this;
     });
-}
+};
 
 var screenShotLoop = function(fileName, index, max, cb){
   console.log("asked to screenshot '" + fileName + index + "', upto '" + max + "'");
   if(index >= max){
     cb();
   } else {
-
-    exec("adb shell screencap -p \"/sdcard/" + fileName + index + ".png\"", function(){
+    var cmdLineCall = "adb shell screencap -p \"/sdcard/" + fileName + index + ".png\"";
+    exec(cmdLineCall, function(){
       var nextIndex = index + 1;
-      screenShotLoop(fileName, nextIndex, max, cb)
+      screenShotLoop(fileName, nextIndex, max, cb);
     });
   }
-}
+};
 
-var burstScreenshot = function(fileName, photosCount){
+var burstScreenshot = function(fileName, photosCount, cb){
   screenShotLoop(fileName, 1, photosCount, function(){
-    return;
+    cb();
   });
-}
+};
 
 var pullFileLoop = function(fileName, dest, index, max, cb){
   console.log("asked to pull '" + fileName + index + "', upto '" + max + "'");
@@ -106,15 +106,14 @@ var pullFileLoop = function(fileName, dest, index, max, cb){
       pullFileLoop(fileName, dest, nextIndex, max, cb);
     });
   }
-}
+};
 
-var pullBursts = function(fileName, dest, photosCount){
-  var index = 1;
-  mkdirp(dest);
-  pullFileLoop(fileName, dest, index, photosCount, function(){
-    return;
-  });
-}
+var pullBursts = function(fileName, dest, photosCount, cb) {
+    mkdirp(dest);
+    pullFileLoop(fileName, dest, 1, photosCount, function(){
+      cb();
+    });
+};
 
 exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('staticTextElement', staticTextElement);
