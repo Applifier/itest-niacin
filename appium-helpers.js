@@ -6,12 +6,13 @@
 var WD_GLOB;
 
 var staticTextElement = function(staticText, timeOut, pollInterval) {
-  if(process.env.APPIUM_PLATFORM == "ios"){
-    return this
-      .waitForElementByIosUIAutomation('.scrollViews()[0]\
-                                        .webViews()[0]\
-                                        .staticTexts()["' + staticText+ '"]',
-                                        timeOut, pollInterval);
+    
+    if(process.env.APPIUM_PLATFORM.toLowerCase() == "ios"){
+        return this
+            .waitForElementByIosUIAutomation('.scrollViews()[0]\
+                                             .webViews()[0]\
+                                             .staticTexts()["' + staticText+ '"]',
+                                             timeOut, pollInterval);
   } else {
     return this
       .waitForElementByName(staticText, timeOut, pollInterval);
@@ -20,7 +21,7 @@ var staticTextElement = function(staticText, timeOut, pollInterval) {
 
 // Use native Instruments for finding elements in iOS
 var iosWaitElement = function(staticText, timeOut, pollInterval) {
-  if(process.env.APPIUM_PLATFORM == "ios") {
+  if(process.env.APPIUM_PLATFORM.toLowerCase() == "ios") {
     return this
       .waitForElementByIosUIAutomation('UIATarget.localTarget()\
                                         .frontMostApp()\
