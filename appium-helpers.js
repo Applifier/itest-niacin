@@ -6,7 +6,7 @@
 var WD_GLOB;
 
 var staticTextElement = function(staticText, timeOut, pollInterval) {
-    
+
     if(process.env.APPIUM_PLATFORM.toLowerCase() == "ios"){
         return this
             .waitForElementByIosUIAutomation('.scrollViews()[0]\
@@ -17,6 +17,18 @@ var staticTextElement = function(staticText, timeOut, pollInterval) {
     return this
       .waitForElementByName(staticText, timeOut, pollInterval);
   }
+};
+
+// TODO: iOS support
+var throwIfVisibleElement = function(staticText) {
+  return this
+    .elementByNameOrNull(staticText)
+    .then(function(element){
+      if(element){
+        throw new Error("throwIfVisibleElement: element '" + staticText + "' is visible!");
+      }
+      return this;
+    });
 };
 
 // Use native Instruments for finding elements in iOS
@@ -101,6 +113,7 @@ exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('logContexts', logContexts);
   wd.addPromiseChainMethod('tapCoordLong', tapCoordLong);
   wd.addPromiseChainMethod('tapCoord', tapCoord);
+  wd.addPromiseChainMethod('throwIfVisibleElement', throwIfVisibleElement);
 };
 
 exports.configureYiewdDriver = function(driver){
