@@ -1,5 +1,6 @@
 var AdbLogcatParser = require('./adb-logcat-parser.js'),
-  LogEntry = require('./logentry.js');
+    LogEntry = require('./logentry.js'),
+    IDeviceLogcatParser = require('./idevice-logcat-parser.js');
 
 
 parseJsonFromMessage = function(stringMessage) {
@@ -64,11 +65,25 @@ function LogCatcher(logType, regexFilter, driver) {
     });
   };
 
+    this.getLatestMessagesWorkaroundIOS = function(cb) {
+        this.iDeviceLogcatParser.popEvents(function(newEvents) {
+            var newEntries = newEvents.filter(function(entry) {
+                return lg.regexFilter.test(entry.message);
+            });
+            lg.entries = lg.entries.concat(newEntries);
+            cb();
+        });        
+    };
+
+
   if(logType == "adbworkaround"){
     this.adbLogcatParser = new AdbLogcatParser('./logcat.log');
     this.getLatestMessages = this.getLatestMessagesWorkaround;
+  } else if (logType == "ideviceworkaround") {
+      this.iDeviceLogcatParser = new IDeviceLogcatParser('./logcat.log');
+      this.getLatestMessages = this.getLatestMessagesWorkaroundIOS;
   } else {
-    this.getLatestMessages = this.getLatestMessagesAppium;
+      this.getLatestMessages = this.getLatestMessagesAppium;
   }
 
 
