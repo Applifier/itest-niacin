@@ -66,9 +66,22 @@ function android_reboot_and_wait_for_device_ready {
 }
 
 function start_script {
-  npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter
+  npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
   MOCHA_BIN='./node_modules/.bin/mocha'
+  if [ ! -f README.mdd ]; then
+    if [ $(which mocha) ]; then 
+      echo "Using system wide install of mocha"
+      MOCHA_BIN='mocha'
+    else
+      echo "Trying to install mocha globally if we have passwordless sudo"
+      sudo -n npm install -g mocha
+      MOCHA_BIN='mocha'
+      if [ ! $(which mocha) ]; then 
+        echo "Still no mocha, giving up!"
+      fi
+    fi
+  fi
 
   echo "Running tests '$TEST'"
   if [ "$TESTDROID" == "1" ]; then
