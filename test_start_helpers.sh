@@ -77,7 +77,7 @@ function start_script {
   
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
   MOCHA_BIN='./node_modules/.bin/mocha'
-  if [ ! -f README.mdd ]; then
+  if [ ! -f "$MOCHA_BIN" ]; then
     if [ $(which mocha) ]; then 
       echo "Using system wide install of mocha"
       MOCHA_BIN='mocha'
