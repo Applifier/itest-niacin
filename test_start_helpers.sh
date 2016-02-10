@@ -67,8 +67,11 @@ function android_reboot_and_wait_for_device_ready {
 
 function start_script {
   if [ ! $(sudo -n echo "can i sudo" ; echo "$?") ]; then
+    echo "Run npm Locally using sudo"
+    sudo rm -rf /home/ubuntu/.npm 2>&1
     sudo -n npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
   else
+    echo "Run npm Locally"
     npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
   fi
   
