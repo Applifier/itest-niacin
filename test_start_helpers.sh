@@ -75,6 +75,7 @@ function start_script {
       MOCHA_BIN='mocha'
     else
       echo "Trying to install mocha globally if we have passwordless sudo"
+      rm -rf node_modules 2>&1
       sudo -n npm install -g chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
       MOCHA_BIN='mocha'
       if [ ! $(which mocha) ]; then 
