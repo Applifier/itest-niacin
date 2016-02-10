@@ -31,9 +31,7 @@ function IDeviceLogcatParser(logFile) {
 
         if (mr === null) {
             if (/^---------\s*beginning\s*of\s*/.test(line)) {
-                console.log("Didn\t parse the generic begin message");
-            } else {
-                console.log("Could not parse logcat line '" + line + "'");
+              console.log("Didn\t parse the generic begin message");
             }
         } else {
             // match[0] is full message
@@ -44,7 +42,7 @@ function IDeviceLogcatParser(logFile) {
                 min = parseInt(mr[4]),
                 sec = parseInt(mr[5]);
             var date = new Date(year, month, day, hour, min, sec);
-            var message = mr[6];            
+            var message = mr[6];
             logEntry = new LogEntry(date, message);
             this.entries.push(logEntry);
         }
