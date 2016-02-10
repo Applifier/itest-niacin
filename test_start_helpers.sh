@@ -66,7 +66,12 @@ function android_reboot_and_wait_for_device_ready {
 }
 
 function start_script {
-  npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
+  if [ ! $(sudo -n echo "can i sudo" ; echo "$?") ]; then
+    sudo -n npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
+  else
+    npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
+  fi
+  
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
   MOCHA_BIN='./node_modules/.bin/mocha'
   if [ ! -f README.mdd ]; then
