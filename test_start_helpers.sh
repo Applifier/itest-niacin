@@ -66,7 +66,7 @@ function android_reboot_and_wait_for_device_ready {
 }
 
 function start_script {
-  if [ ! $(sudo -n echo "can i sudo" ; echo "$?") ]; then
+  if [ ! $(sudo -n 'echo "can i sudo" ; echo "$?"') ]; then
     echo "Run npm Locally using sudo"
     sudo rm -rf /home/ubuntu/.npm 2>&1
     sudo -n npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
@@ -85,10 +85,10 @@ function start_script {
       echo "Trying to install mocha globally if we have passwordless sudo"
       rm -rf node_modules 2>&1
       #sudo -n npm install -g chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
-      MOCHA_BIN='mocha'
+      #MOCHA_BIN='mocha'
       sudo -n npm install chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter 2>&1
       MOCHA_BIN='./node_modules/.bin/mocha'
-      if [ ! $(which mocha) ]; then 
+      if [ ! $(which "$MOCHA_BIN") ]; then 
         echo "Still no mocha, giving up!"
       fi
     fi
