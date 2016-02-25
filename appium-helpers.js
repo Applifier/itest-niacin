@@ -90,6 +90,11 @@ var logContexts = function(tagStr){
     });
 }
 
+var consoleLog = function(text) {
+  console.log(text);
+  return this;
+}
+
 var tapCoordLong = function(xCoord, yCoord){
   var action = new WD_GLOB.TouchAction();
   var thisAction = action.longPress({el: null, x: xCoord, y: yCoord})
@@ -104,6 +109,13 @@ var tapCoord = function(xCoord, yCoord){
     .performTouchAction(thisAction);
 }
 
+var screenshotIndex = 0;
+var saveNumberedScreenshot = function(name) {
+  var formattedIndex = ("0" + screenshotIndex++).slice(-2);
+  return this
+    .saveScreenshot("screenshots/" + formattedIndex + "-" + name);
+}
+
 exports.configureWd = function(wd) {
   WD_GLOB = wd;
   wd.addPromiseChainMethod('staticTextElement', staticTextElement);
@@ -114,6 +126,8 @@ exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('tapCoordLong', tapCoordLong);
   wd.addPromiseChainMethod('tapCoord', tapCoord);
   wd.addPromiseChainMethod('throwIfVisibleElement', throwIfVisibleElement);
+  wd.addPromiseChainMethod('log', consoleLog);
+  wd.addPromiseChainMethod('saveNumberedScreenshot', saveNumberedScreenshot);
 };
 
 exports.configureYiewdDriver = function(driver){
