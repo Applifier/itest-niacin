@@ -69,8 +69,20 @@ function get_android_device_name {
   adb devices 1>&2
   adb wait-for-device 1>&2 & pid=$!
   export ADB_WAIT_DEVICE_PID=$pid
-  (bash -c "sleep 10 ; kill $ADB_WAIT_DEVICE_PID")
+  (bash -c "sleep 10 ; kill $ADB_WAIT_DEVICE_PID") > /dev/null & disown
+  wait $ADB_WAIT_DEVICE_PID
   phone_name="$(adb shell getprop ro.product.manufacturer | tr -d '[[:space:]]')-$(adb shell getprop ro.product.model | tr -d '[[:space:]]')" 1>&2
+  phone_name=${phone_name:='no_droid_device_found'}
+  if [ "$TESTDROID" == "1" ]; then
+    echo "TD-$TESTDROID"
+  else
+    echo "$phone_name"
+  fi
+}
+
+function get_ios_device_name {
+  phone_name=$(idevicename |tr -d '[[:space:]]' |sed -e 's/[^A-Za-z0-9\-_]//g')
+  phone_name=${phone_name:='no_iOS_device_found'}
   if [ "$TESTDROID" == "1" ]; then
     echo "TD-$TESTDROID"
   else
