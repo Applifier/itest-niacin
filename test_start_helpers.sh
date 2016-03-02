@@ -65,6 +65,17 @@ function android_reboot_and_wait_for_device_ready {
   echo "Rebooted"
 }
 
+function get_android_device_name {
+  adb devices 1>&2
+  adb wait-for-device 1>&2
+  phone_name="$(adb shell getprop ro.product.manufacturer | tr -d '[[:space:]]')-$(adb shell getprop ro.product.model | tr -d '[[:space:]]')" 1>&2
+  if [ "$TESTDROID" == "1" ]; then
+    echo "TD-$TESTDROID"
+  else
+    echo "$phone_name"
+  fi
+}
+
 function start_script {
   npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter"
   if [ ! $(sudo -n 'echo "can i sudo"' ; echo "$?") ]; then
@@ -75,11 +86,11 @@ function start_script {
     echo "Run npm Locally"
     npm install $npm_libraries 2>&1
   fi
-  
+
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
   MOCHA_BIN='./node_modules/.bin/mocha'
   if [ ! -f "$MOCHA_BIN" ]; then
-    if [ $(which mocha) ]; then 
+    if [ $(which mocha) ]; then
       echo "Using system wide install of mocha"
       MOCHA_BIN='mocha'
     else
@@ -87,7 +98,7 @@ function start_script {
       rm -rf node_modules 2>&1
       sudo -n npm install $npm_libraries 2>&1
       MOCHA_BIN='./node_modules/.bin/mocha'
-      if [ ! $(which "$MOCHA_BIN") ]; then 
+      if [ ! $(which "$MOCHA_BIN") ]; then
         echo "Still no mocha, giving up!"
         exit 102
       fi
