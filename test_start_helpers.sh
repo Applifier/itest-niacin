@@ -91,7 +91,7 @@ function get_ios_device_name {
 }
 
 function start_script {
-  npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-junit-reporter"
+  npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-jenkins-reporter"
   if [ ! $(sudo -n 'echo "can i sudo"' ; echo "$?") ]; then
     echo "Run npm Locally using sudo"
     sudo rm -rf /home/ubuntu/.npm 2>&1
@@ -121,7 +121,12 @@ function start_script {
 
   echo "Running tests '$TEST'"
   if [ "$TESTDROID" == "1" ]; then
-    ${MOCHA_BIN} "${TEST}" --reporter mocha-junit-reporter --reporter-options mochaFile=./TEST-all.xml 2>&1
+    export JUNIT_REPORT_STACK=1
+    export JUNIT_REPORT_PATH="TEST-all.xml"
+    JUNIT_REPORT_NAME="$DEVICE_NAME"
+    JUNIT_REPORT_NAME=${JUNIT_REPORT_NAME:="No Device Name Set"}
+    export JUNIT_REPORT_NAME
+    ${MOCHA_BIN} "${TEST}" --reporter mocha-jenkins-reporter 2>&1
   else
     ${MOCHA_BIN} "$TEST"
   fi
