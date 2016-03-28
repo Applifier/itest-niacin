@@ -1,10 +1,19 @@
 /* jshint node: true, multistr: true */
 
-// The buttons on the ad screen cannot be recognized by same appium methods
-// on iOS as on Android, Use this method instead.
 
 var WD_GLOB;
 
+/* Try to initialize Driver and verify that we get instance of it
+   Sometimes Appium has hard time launching Instruments on iOS
+   (and will return 'undefined') so we need to handle that case
+ */
+var initializeDriver = function(capabilities, timeOut) {
+  return this.init(capabilities).setImplicitWaitTimeout(timeOut);
+}
+
+
+// The buttons on the ad screen cannot be recognized by same appium methods
+// on iOS as on Android, Use this method instead.
 var staticTextElement = function(staticText, timeOut, pollInterval) {
 
     if(process.env.APPIUM_PLATFORM.toLowerCase() == "ios"){
@@ -128,6 +137,7 @@ exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('throwIfVisibleElement', throwIfVisibleElement);
   wd.addPromiseChainMethod('log', consoleLog);
   wd.addPromiseChainMethod('saveNumberedScreenshot', saveNumberedScreenshot);
+  wd.addPromiseChainMethod('initializeDriver', initializeDriver);
 };
 
 exports.configureYiewdDriver = function(driver){
@@ -136,4 +146,5 @@ exports.configureYiewdDriver = function(driver){
   driver.messagesFromLog = messagesFromLog;
   driver.jsonObjectsFromLog = jsonObjectsFromLog;
   driver.logContexts = logContexts;
+  driver.initializeDriver = initializeDriver;
 };
