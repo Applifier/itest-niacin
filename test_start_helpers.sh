@@ -3,6 +3,8 @@
 
 source "logcat_pinger.sh"
 
+NPM_INSTALL=1
+
 # Take a screenshot from connected android device into a child-folder named 'screenshots'
 # Arg1: screenshot filename
 function take_screenshot {
@@ -92,15 +94,27 @@ function get_ios_device_name {
   fi
 }
 
+function usage(){
+  echo -e "usage:\n   $0 OPTIONS"
+  echo -e "OPTIONS:"
+  echo -e "\t -h\tShow this message"
+  echo -e "\t -n\tDon't install/update npm packages"
+}
+
 function start_script {
-  npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-jenkins-reporter"
-  if [ ! $(sudo -n 'echo "can i sudo"' ; echo "$?") ]; then
-    echo "Run npm Locally using sudo"
-    sudo rm -rf /home/ubuntu/.npm 2>&1
-    sudo -n npm install $npm_libraries 2>&1
+
+  if [ "$NPM_INSTALL" -eq "1" ]; then
+    npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-jenkins-reporter"
+    if [ ! $(sudo -n 'echo "can i sudo"' ; echo "$?") ]; then
+      echo "Run npm Locally using sudo"
+      sudo rm -rf /home/ubuntu/.npm 2>&1
+      sudo -n npm install $npm_libraries 2>&1
+    else
+      echo "Run npm Locally"
+      npm install $npm_libraries 2>&1
+    fi
   else
-    echo "Run npm Locally"
-    npm install $npm_libraries 2>&1
+    echo "Skipping npm install"
   fi
 
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
@@ -134,3 +148,12 @@ function start_script {
   fi
   return $?
 }
+
+while getopts hn OPTIONS; do
+  case $OPTIONS in
+    n ) NPM_INSTALL=0 ;;
+    h ) usage; exit ;;
+    \? ) echo "Unknown option -$OPTARG" >&2 ; exit 1;;
+    : ) echo "Missing required argument for -$OPTARG" >&2 ; exit 1;;
+  esac
+done
