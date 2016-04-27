@@ -1,7 +1,9 @@
 #!/bin/bash
 # Helpers for commandline scripts related to appium tests.
 
-source "logcat_pinger.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/install_and_start_py.sh"
+source "$SCRIPT_DIR/logcat_pinger.sh"
 
 # Take a screenshot from connected android device into a child-folder named 'screenshots'
 # Arg1: screenshot filename
@@ -90,6 +92,13 @@ function get_ios_device_name {
   else
     echo "$phone_name"
   fi
+}
+
+
+function start_script_py {
+    install_libs_py
+    start_tests_py
+    return $?
 }
 
 function start_script {
