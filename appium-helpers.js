@@ -161,4 +161,5 @@ exports.configureYiewdDriver = function(driver){
   driver.jsonObjectsFromLog = jsonObjectsFromLog;
   driver.logContexts = logContexts;
   driver.initializeDriver = initializeDriver;
+  driver.listElementsXml = listElementsXml;
 };
