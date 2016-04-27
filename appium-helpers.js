@@ -1,5 +1,6 @@
 /* jshint node: true, multistr: true */
 
+var parseString = require('xml2js').parseString;
 
 var WD_GLOB;
 
@@ -39,6 +40,18 @@ var throwIfVisibleElement = function(staticText) {
       return this;
     });
 };
+
+var listElementsXml = function(){
+  return this
+    .source()
+    .then(function(xmlStr){
+      parseString(xmlStr, function(err, resultJson){
+        result = JSON.stringify(resultJson, null, ' ');
+        console.log("***ListElementsXml: log");
+        console.log(result);
+      });
+    })
+}
 
 // Use native Instruments for finding elements in iOS
 var iosWaitElement = function(staticText, timeOut, pollInterval) {
@@ -97,7 +110,7 @@ var logContexts = function(tagStr){
       console.log("Visible contexts at " + tagStr + ": " + contexts);
       return this;
     });
-}
+};
 
 var consoleLog = function(text) {
   console.log(text);
@@ -138,6 +151,7 @@ exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('log', consoleLog);
   wd.addPromiseChainMethod('saveNumberedScreenshot', saveNumberedScreenshot);
   wd.addPromiseChainMethod('initializeDriver', initializeDriver);
+  wd.addPromiseChainMethod('listElementsXml', listElementsXml);
 };
 
 exports.configureYiewdDriver = function(driver){
@@ -147,4 +161,5 @@ exports.configureYiewdDriver = function(driver){
   driver.jsonObjectsFromLog = jsonObjectsFromLog;
   driver.logContexts = logContexts;
   driver.initializeDriver = initializeDriver;
+  driver.listElementsXml = listElementsXml;
 };
