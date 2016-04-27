@@ -93,7 +93,7 @@ function get_ios_device_name {
 }
 
 function start_script {
-  npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-jenkins-reporter"
+  npm_libraries="chai@2.1.2 colors underscore chai-as-promised wd path mkdirp yiewd tail mocha mocha-jenkins-reporter xml2js"
   if [ ! $(sudo -n 'echo "can i sudo"' ; echo "$?") ]; then
     echo "Run npm Locally using sudo"
     sudo rm -rf /home/ubuntu/.npm 2>&1
