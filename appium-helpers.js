@@ -46,6 +46,17 @@ var listElementsXml = function(){
     .source()
     .then(function(xmlStr){
       parseString(xmlStr, function(err, resultJson){
+        if(err){
+          console.log("**** listElementsXml error ****");
+          console.log("listElementsXml error: '" + err + "'");
+          console.log("***** RAW STR *****");
+          //console.log(xmlStr);
+          console.log("Edit appium-helpers.js for more info");
+          // Please consider writing the raw output of 'xmlStr' into a file"
+          // Open the file in a browser and find the elements for example with
+          // https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb/support?hl=en
+          console.log("**** /RAW STR/ ****");
+        }
         result = JSON.stringify(resultJson, null, ' ');
         console.log("***ListElementsXml: log");
         console.log(result);
