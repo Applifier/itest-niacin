@@ -7,14 +7,16 @@ export TEST_RUNNING_FILE="$(mktemp)"
 # Args:
 # $1 host_to_ping
 function ping_to_logcat {
+  echo "ping_to_logcat TEST_RUNNING_FILE=$TEST_RUNNING_FILE"
   MINIMUM_LOOP_TIME=5
-  PINGS_IN_BLOCK=10
+  PINGS_IN_BLOCK=4
+  INTERVAL=3
   touch "${TEST_RUNNING_FILE:?}"
   (
     while [ -f "${TEST_RUNNING_FILE:?}" ]
     do
       date_at_start=$(date +%s)
-      adb shell "ping -c${PINGS_IN_BLOCK} $1 |while read line ; do log -pd -tQApinger \$line ; done"
+      adb shell "ping -c${PINGS_IN_BLOCK} -i${INTERVAL} $1 |while read line  ; do line=\$(echo \$line | sed -e 's/-/_/g') ; log -pd -tQApinger \"\$line .\" ; done"
       # Avoid looping out of control if something fails
       if [ "$(( date_at_start + MINIMUM_LOOP_TIME))" -gt "$(date +%s)" ]; then
         echo "Looping too fast, probably something failed. Throttling"
@@ -31,6 +33,7 @@ function ping_to_logcat {
 # Args:
 # $1 url_to_fetch
 function curl_to_logcat {
+  echo "curl_to_logcat TEST_RUNNING_FILE=$TEST_RUNNING_FILE"
   MINIMUM_LOOP_TIME=10
   curler_cmd="log -pd -tQAcurler \$(curl -s -m 2 \"$1\" || echo -n "FAILED")"
   echo "Will loop command '$curler_cmd' on device"
