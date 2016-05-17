@@ -16,7 +16,7 @@ function ping_to_logcat {
     while [ -f "${TEST_RUNNING_FILE:?}" ]
     do
       date_at_start=$(date +%s)
-      adb shell "ping -c${PINGS_IN_BLOCK} -i${INTERVAL} $1 |while read line  ; do line=\$(echo \$line | sed -e "s/-/_/g") ; log -pd -tQApinger "\$line ." ; done"
+      adb shell "ping -c${PINGS_IN_BLOCK} -i${INTERVAL} $1 |while read line  ; do line=\$(echo \$line | sed -e 's/-/_/g') ; log -pd -tQApinger \"\$line .\" ; done"
       # Avoid looping out of control if something fails
       if [ "$(( date_at_start + MINIMUM_LOOP_TIME))" -gt "$(date +%s)" ]; then
         echo "Looping too fast, probably something failed. Throttling"
