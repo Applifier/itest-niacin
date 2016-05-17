@@ -1,7 +1,7 @@
 #!/bin/bash
 # Helpers for commandline scripts related to appium tests.
-
-source "logcat_pinger.sh"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/logcat_pinger.sh"
 
 # Take a screenshot from connected android device into a child-folder named 'screenshots'
 # Arg1: screenshot filename
