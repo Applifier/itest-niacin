@@ -10,7 +10,7 @@ var WD_GLOB;
  */
 var initializeDriver = function(capabilities, timeOut) {
   return this.init(capabilities).setImplicitWaitTimeout(timeOut);
-}
+};
 
 
 // The buttons on the ad screen cannot be recognized by same appium methods
@@ -41,6 +41,19 @@ var throwIfVisibleElement = function(staticText) {
     });
 };
 
+var gotoContextIdx = function(index) {
+  var thisdriver = this;
+  return this
+    .contexts()
+    .then(function(contexts){
+      console.log("contexts = '" + contexts + "'");
+      var newContext = contexts[index];
+      console.log("Switching to context '" + newContext + "'");
+      return thisdriver
+        .context(newContext);
+    });
+};
+
 var listElementsXml = function(){
   return this
     .source()
@@ -61,8 +74,8 @@ var listElementsXml = function(){
         console.log("***ListElementsXml: log");
         console.log(result);
       });
-    })
-}
+    });
+};
 
 // Use native Instruments for finding elements in iOS
 var iosWaitElement = function(staticText, timeOut, pollInterval) {
@@ -126,28 +139,28 @@ var logContexts = function(tagStr){
 var consoleLog = function(text) {
   console.log(text);
   return this;
-}
+};
 
 var tapCoordLong = function(xCoord, yCoord){
   var action = new WD_GLOB.TouchAction();
-  var thisAction = action.longPress({el: null, x: xCoord, y: yCoord})
+  var thisAction = action.longPress({el: null, x: xCoord, y: yCoord});
   return this
     .performTouchAction(action);
-}
+};
 
 var tapCoord = function(xCoord, yCoord){
   var action = new WD_GLOB.TouchAction();
-  var thisAction = action.tap({el: null, x: xCoord, y: yCoord})
+  var thisAction = action.tap({el: null, x: xCoord, y: yCoord});
   return this
     .performTouchAction(thisAction);
-}
+};
 
 var screenshotIndex = 0;
 var saveNumberedScreenshot = function(name) {
   var formattedIndex = ("0" + screenshotIndex++).slice(-2);
   return this
     .saveScreenshot("screenshots/" + formattedIndex + "-" + name);
-}
+};
 
 exports.configureWd = function(wd) {
   WD_GLOB = wd;
@@ -163,6 +176,7 @@ exports.configureWd = function(wd) {
   wd.addPromiseChainMethod('saveNumberedScreenshot', saveNumberedScreenshot);
   wd.addPromiseChainMethod('initializeDriver', initializeDriver);
   wd.addPromiseChainMethod('listElementsXml', listElementsXml);
+  wd.addPromiseChainMethod('gotoContextIdx', gotoContextIdx);
 };
 
 exports.configureYiewdDriver = function(driver){
