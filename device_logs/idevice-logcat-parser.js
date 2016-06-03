@@ -6,11 +6,11 @@ function IDeviceLogcatParser(logFile) {
     this.logFile = logFile;
     this.entries = [];
     this.headerHandled = false;
-    var IDeviceLogcatParser = this;
+    var iDeviceLogcatParser = this;
 
     this.tail.on("line", function(data) {
         if (this.headerHandled) {
-            IDeviceLogcatParser.parseAndStoreLine(data, function() {
+            iDeviceLogcatParser.parseAndStoreLine(data, function() {
             });
         } else {
             this.headerHandled = true;
@@ -26,7 +26,7 @@ function IDeviceLogcatParser(logFile) {
     this.parseAndStoreLine = function(line, cb) {
         // example format from idevicesyslog
         // Jan 25 10:04:39 iphone6s-4 unityads-appium[381] <Warning>: ENTERED_METHOD
-        var parsingRegex = /(\S+) (\d+) (\d+):(\d+):(\d+)\s(.*)/;
+        var parsingRegex = /^(\S+)\s*(\d+)\s*(\d+):(\d+):(\d+)\s(.*)/;
         var mr = line.match(parsingRegex);
 
         if (mr === null) {
