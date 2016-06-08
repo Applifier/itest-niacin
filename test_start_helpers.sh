@@ -109,7 +109,11 @@ function start_script {
     sudo -n npm install $npm_libraries 2>&1
   else
     echo "Run npm Locally"
-    npm install $npm_libraries 2>&1
+    if [ ! -d "node_modules" ];then
+      npm install $npm_libraries 2>&1
+    else
+      echo "** Not installing npm modules as 'node_modules'-folder is already present"
+    fi
   fi
 
   echo "mocha executable: '$(file node_modules/.bin/mocha)'"
