@@ -119,16 +119,15 @@ class iOS(PlatformBase):
         """
         return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
 
+
+
     @staticmethod
     def toggle_orientation(driver):
-        def change_orientation(driver, orientation):
-            driver.orientation = orientation
-
         current_orientation = driver.orientation
         if current_orientation == "PORTRAIT":
-            return change_orientation(driver, "LANDSCAPE")
+            driver.orientation = "LANDSCAPE"
         else:
-            return change_orientation(driver, "PORTRAIT")
+            driver.orientation = "PORTRAIT"
 
     @staticmethod
     def get_xml_tree(driver):
