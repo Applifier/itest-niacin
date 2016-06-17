@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+function setup_virtualenv {
+    virtualenv -p /usr/local/bin/python3 --no-site-packages --distribute .env
+}
+
 function install_libs_py {
     echo "installing py libs"
     if [ "$TESTDROID" == "1" ]; then
@@ -20,3 +24,7 @@ function start_tests_py {
     python "$TEST"
     return $?
 }
+
+# Bash magic to call functions defined here from the CLI e.g.
+## ./install_and_start_py.sh setup_virtualenv
+"$@"
