@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function setup_virtualenv {
     virtualenv -p /usr/local/bin/python3 --no-site-packages --distribute .env
 }
@@ -16,6 +18,12 @@ function install_libs_py {
         JUNIT_REPORT_NAME="$DEVICE_NAME"
         JUNIT_REPORT_NAME=${JUNIT_REPORT_NAME:="No Device Name Set"}
         export JUNIT_REPORT_NAME
+    else
+        echo "using virtual env.."
+        setup_virtualenv
+        
+        source "$SCRIPT_DIR/activate_venv.sh"
+        pip install -r "$SCRIPT_DIR/requirements.txt"
     fi
 }
 
