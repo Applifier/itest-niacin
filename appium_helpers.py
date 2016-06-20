@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-from appium import webdriver
-from appium.webdriver import errorhandler
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from abc import ABCMeta
 from abc import abstractmethod
 from subprocess import check_output
 from subprocess import CalledProcessError
 from os import getcwd
 from os import environ
-
+from os.path import exists
+from os import makedirs
+from appium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def get_capabilities(options={}):
     """
@@ -19,7 +19,7 @@ def get_capabilities(options={}):
     then use defaults
     """
     return {
-        "ipa" : environ.get("APPIUM_APPFILE") or options.get("ipa"),
+        "app" : environ.get("APPIUM_APPFILE") or options.get("app"),
         "automationName" : environ.get("APPIUM_AUTOMATION") or options.get("automationName"),
         "deviceName" : environ.get("APPIUM_DEVICE") or options.get("deviceName", "Local Device"),
         "platformName" : environ.get("APPIUM_PLATFORM") or options.get("platformName"),
@@ -38,16 +38,31 @@ def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabiliti
         return None
 
 class PlatformBase(object):
+    """
+    Appium Base Class for common functionality between iOS and Android
+    """
     __metaclass__ = ABCMeta
     @abstractmethod
-    def __init__(self, driver):
-        self.driver = driver
+    def __init__(self):
+        # create Screenshot dir
+        screenshot_dir = getcwd() + '/screenshots'
+        if not exists(screenshot_dir):
+            makedirs(screenshot_dir)
+
     @abstractmethod
     def __getattr__(self, name):
         def _missing(*args, **kwargs):
             print("object %r and method %r" % (self, name))
             print("args: %r kwargs: %r" % (args, kwargs))
         return _missing
+
+    @staticmethod
+    def screenshot(driver, name, directory=getcwd()+'/screenshots'):
+        """
+        Screenshotting is super slow - use it seldom
+        """
+        name = str(name) + '.png'
+        return driver.save_screenshot(directory + "/" + name)
 
 class Android(PlatformBase):
     pass
@@ -121,8 +136,6 @@ class iOS(PlatformBase):
         """
         return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
 
-
-
     @staticmethod
     def toggle_orientation(driver):
         current_orientation = driver.orientation
@@ -136,7 +149,7 @@ class iOS(PlatformBase):
         return driver.execute_script('au.mainApp().getTreeForXML()')
 
     @staticmethod
-    def screenshot_fast(driver, name, dir=getcwd()+'/screenshots'):
+    def screenshot_fast(driver, name, directory=getcwd()+'/screenshots'):
         """
         Takes PNG screenshot using command idevicescreenshot.
         """
@@ -147,16 +160,8 @@ class iOS(PlatformBase):
         name = str(name) + '.png'
 
         try:
-            out = check_output(["idevicescreenshot", "-u", str(udid), dir+'/'+name])
+            out = check_output(["idevicescreenshot", "-u", str(udid), directory+'/'+name])
         except CalledProcessError as e:
             print("Error taking screenshot {} in {} with error {}".format(name, dir, e.output))
             return False
         return True
-
-    @staticmethod
-    def screenshot(driver, name, dir=getcwd()+'/screenshots'):
-        """
-        Screenshotting is super slow - use it seldom
-        """
-        name = str(name) + '.png'
-        return driver.save_screenshot(dir + "/" + name)
