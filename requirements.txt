@@ -1,2 +1,4 @@
 Appium-Python-Client==0.22
 selenium==2.53.5
+six==1.10.0
+unittest-xml-reporting==2.1.0

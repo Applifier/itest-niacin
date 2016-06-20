@@ -31,9 +31,11 @@ def get_capabilities(options={}):
     }
 
 def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities={}):
-    # TODO WebDriverException (session already ongoing)
-    # TODO URLError (no appium session)
-    return driver.Remote(addr, capabilities)
+    try:
+        return driver.Remote(addr, capabilities)
+    except Exception as e:
+        print("\n\nError staring Appium session: '{}'\n\n".format(e))
+        return None
 
 class PlatformBase(object):
     __metaclass__ = ABCMeta
