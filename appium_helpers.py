@@ -44,7 +44,7 @@ def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabiliti
     try:
         return driver.Remote(addr, capabilities)
     except Exception as e:
-        print("\n\nError staring Appium session: '{}'\n\n".format(e))
+        print("\n\nError starting Appium session: '{}'\n\n".format(e))
         return None
 
 class PlatformBase(object):
