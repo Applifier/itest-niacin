@@ -12,12 +12,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def get_capabilities(options={}):
+def get_capabilities(options=None):
     """
     Try to use the capabilities defined in ENV variable or
     then use capabilities defined in 'options' or
     then use defaults
     """
+    if not options:
+        options = {}
     return {
         "app" : environ.get("APPIUM_APPFILE") or options.get("app"),
         "automationName" : environ.get("APPIUM_AUTOMATION") or options.get("automationName"),
@@ -30,7 +32,15 @@ def get_capabilities(options={}):
         "screenshotWaitTimeout" : environ.get("SCREENSHOT_WAIT_TIMEOUT") or options.get("screenshotWaitTimeout", 3)
     }
 
-def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities={}):
+def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities=None):
+    """
+    Get the Appium Driver
+    **Note**
+        We assume the App/Ipa has been installed in the device
+        before calling this method
+    """
+    if not capabilities:
+        capabilities = {}
     try:
         return driver.Remote(addr, capabilities)
     except Exception as e:
@@ -42,14 +52,13 @@ class PlatformBase(object):
     Appium Base Class for common functionality between iOS and Android
     """
     __metaclass__ = ABCMeta
-    @abstractmethod
+
     def __init__(self):
         # create Screenshot dir
         screenshot_dir = getcwd() + '/screenshots'
         if not exists(screenshot_dir):
             makedirs(screenshot_dir)
 
-    @abstractmethod
     def __getattr__(self, name):
         def _missing(*args, **kwargs):
             print("object %r and method %r" % (self, name))
@@ -129,7 +138,8 @@ class iOS(PlatformBase):
             driver: instance of Appium.webdriver
             expected_condition: what we condition we expect to happen
             by_method: by with what Appium.webdriver.method we try to find the element
-            element_identifier: depending on 'by_method' what indentifier we try to use to locate the elem
+            element_identifier: depending on 'by_method' what indentifier we try
+            to use to locate the elem
             wait_time: time to wait element to appear
 
         Returns: instance of appium.webdriver.webelement or TimeoutException
@@ -148,20 +158,46 @@ class iOS(PlatformBase):
     def get_xml_tree(driver):
         return driver.execute_script('au.mainApp().getTreeForXML()')
 
-    @staticmethod
-    def screenshot_fast(driver, name, directory=getcwd()+'/screenshots'):
-        """
-        Takes PNG screenshot using command idevicescreenshot.
-        """
 
-        #TODO: we need to define the device we launch the appium-server against in ENV
-        #      This will fail if multiple devices are present
-        udid = check_output(["idevice_id", "-l"]).decode("utf-8").strip('\n')
+    @staticmethod
+    def get_udid():
+        """
+        Gets list of connected iDevice udid's
+        """
+        return check_output(["idevice_id", "-l"]).decode("utf-8").strip('\n').split()
+
+    @staticmethod
+    def screenshot_fast(driver, name, directory=getcwd()+'/screenshots', udid=None):
+        """
+        Takes PNG screenshot using command idevicescreenshot
+        """
+        if not udid:
+            udid = environ.get("IDEVICE_UDID") or iOS.get_udid()[-1]
+
         name = str(name) + '.png'
 
         try:
-            out = check_output(["idevicescreenshot", "-u", str(udid), directory+'/'+name])
-        except CalledProcessError as e:
-            print("Error taking screenshot {} in {} with error {}".format(name, dir, e.output))
+            check_output(["idevicescreenshot", "-u", str(udid), directory+'/'+name])
+        except CalledProcessError as err:
+            print("Error taking screenshot {} in {} with error {}".format(name, dir, err.output))
             return False
         return True
+
+    @staticmethod
+    def install_package(package_path, udid=None):
+        """
+        Install package to the device using 'ideviceinstaller'
+        """
+        if not udid:
+            udid = environ.get("IDEVICE_UDID") or iOS.get_udid()[-1]
+        if not exists(package_path):
+            print("Package '{}' doesn't exist".format(package_path))
+            return False
+
+        try:
+            check_output(["ideviceinstaller", "-u", str(udid), "-i", package_path])
+            return True
+        except CalledProcessError as err:
+            print("Error installing package to {} the device {}, msg: {}".format(package_path,
+                                                                                 udid,
+                                                                                 err))
