@@ -49,7 +49,14 @@ function pull_screenshot_batch {
 }
 
 function get_full_path {
-  echo "$( cd "$(dirname "$1")"; echo "$(pwd)/$(basename "$1")" )"
+  if [ -f "$1" ]; then
+    echo "$( cd "$(dirname "$1")"; echo "$(pwd)/$(basename "$1")" )"
+  elif [ -d "$1" ]; then
+    echo "$(cd "$1"; echo "$(pwd)")"
+  else
+    echo "WARNING! get_full_path: no such file or dir! '$1'" 1>&2
+    echo "itest_niacin-get_full_path-failed.File-does-not-exist/$1"
+  fi
 }
 
 function android_reboot_and_wait_for_device_ready {
