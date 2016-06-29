@@ -72,6 +72,13 @@ class PlatformBase(object):
         """
         name = str(name) + '.png'
         return driver.save_screenshot(directory + "/" + name)
+    @staticmethod
+    def get_window_sizes(driver):
+        """
+        Returns the height, width of the current window size as int
+        """
+        h, w = driver.get_window_size().values()
+        return int(h), int(w)
 
 class Android(PlatformBase):
     pass
