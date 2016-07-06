@@ -32,6 +32,27 @@ def get_capabilities(options=None):
         "screenshotWaitTimeout" : environ.get("SCREENSHOT_WAIT_TIMEOUT") or options.get("screenshotWaitTimeout", 3)
     }
 
+def get_capabilities_15(options=None):
+    """
+    Try to use Capabilities for Appium v 1.5
+    """
+    if not options:
+        options = {}
+    return {
+        "app" : environ.get("APPIUM_APPFILE") or options.get("app"),
+        "automationName" : environ.get("APPIUM_AUTOMATION_15") or options.get("automationName", "Appium"),
+        "udid" : environ.get("IDEVICE_UDID") or options.get("udid", None),
+        "deviceName" : environ.get("APPIUM_DEVICE") or options.get("deviceName", "Local Device"),
+        "defaultDevice" : True,
+        "platformName" : environ.get("APPIUM_PLATFORM") or options.get("platformName"),
+        "bundleId" : environ.get("APPIUM_BUNDLE_ID") or options.get("bundleId"),
+        "newCommandTimeout" : environ.get("NEW_COMMAND_TIMEOUT") or options.get("newCommandTimeout", 60),
+        "defaultCommandTimeout" : environ.get("DEFAULT_COMMAND_TIMEOUT") or options.get("defaultCommandCommandTimeout", 500),
+        "testdroid_testTimeout" : environ.get("TESTDROID_TEST_TIMEOUT") or options.get("testdroid_testTimeout", 600),
+        "screenshotWaitTimeout" : environ.get("SCREENSHOT_WAIT_TIMEOUT") or options.get("screenshotWaitTimeout", 3)
+    }
+
+
 def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities=None):
     """
     Get the Appium Driver
