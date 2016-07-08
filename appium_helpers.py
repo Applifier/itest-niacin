@@ -11,6 +11,7 @@ from appium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import WebDriverException
 
 def get_capabilities(options=None):
     """
@@ -68,6 +69,7 @@ def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabiliti
         print("\n\nError starting Appium session: '{}'\n\n".format(e))
         return None
 
+#### Common Keywords #####
 class PlatformBase(object):
     """
     Appium Base Class for common functionality between iOS and Android
@@ -94,15 +96,41 @@ class PlatformBase(object):
         name = str(name) + '.png'
         return driver.save_screenshot(directory + "/" + name)
     @staticmethod
-    def get_window_sizes(driver):
+    def get_window_size(driver):
         """
         Returns the height, width of the current window size as int
         """
-        h, w = driver.get_window_size().values()
-        return int(h), int(w)
+        res = driver.get_window_size()
 
+        return int(res['height']), int(res['width'])
+
+    @staticmethod
+    def get_element_location(element):
+        """
+        Return the element location (h,w) as int
+        """
+        element_coord = element.location
+        return int(element_coord['y']), int(element_coord['x'])
+
+    @staticmethod
+    def click_retry_with_elem_coordinates(driver, element):
+        """
+        Tries to click button, and in case of ServerSideError tries
+        to tap the element coordinates
+        """
+        try:
+            element.click()
+        except WebDriverException as e:
+            print("Element couldn't be clicked, error: '{}'".format(e))
+            h, w = PlatformBase.get_element_location(element)
+            print("Will try to tap the element location w:{}, h:{}".format(w, h))
+            return driver.tap([(w, h)])
+
+
+#### Android Keywords #####
 class Android(PlatformBase):
     pass
+
 
 #### iOS Keywords #####
 class iOS(PlatformBase):

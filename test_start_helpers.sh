@@ -104,6 +104,7 @@ function get_ios_device_name {
 
 function start_script_py {
     install_libs_py
+    echo "After install $(date)"
     start_tests_py
     return $?
 }
