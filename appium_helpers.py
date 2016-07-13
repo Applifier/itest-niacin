@@ -12,6 +12,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException
+from appium.webdriver.webdriver import WebDriver
+
+# pylint: disable=C0301
+
 
 def get_capabilities(options=None):
     """
@@ -77,6 +81,7 @@ class PlatformBase(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
+        print("PlatformBase initted")
         # create Screenshot dir
         screenshot_dir = getcwd() + '/screenshots'
         if not exists(screenshot_dir):
@@ -130,7 +135,6 @@ class PlatformBase(object):
 #### Android Keywords #####
 class Android(PlatformBase):
     pass
-
 
 #### iOS Keywords #####
 class iOS(PlatformBase):
@@ -257,3 +261,16 @@ class iOS(PlatformBase):
             print("Error installing package to {} the device {}, msg: {}".format(package_path,
                                                                                  udid,
                                                                                  err))
+
+class NiacinWebDriver(WebDriver):
+    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',desired_capabilities=None, browser_profile=None, proxy=None,keep_alive=False):
+        print("initting Appium WebDriver..")
+        super().__init__(command_executor, desired_capabilities,browser_profile, proxy, keep_alive)
+
+        platform = desired_capabilities['platformName']
+        if platform.lower() == "ios":
+            print("initting platform as iOS")
+            self.platform = iOS()
+        elif platform.lower() == "android":
+            print("initting platform as Android")
+            self.platform = Android()
