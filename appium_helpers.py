@@ -7,6 +7,7 @@ from os import getcwd
 from os import environ
 from os.path import exists
 from os import makedirs
+from inspect import signature
 from appium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -274,3 +275,21 @@ class NiacinWebDriver(WebDriver):
         elif platform.lower() == "android":
             print("initting platform as Android")
             self.platform = Android()
+
+    def __getattr__(self, function_name):
+        def __missing(*args, **kwargs):
+            """
+            Function to try to check does the function exists in
+            the platform instance. If it does then we check does it take
+            WebDriver instance and inject NiacinWebDriver instance
+            into the passed args and return the function value
+            """
+            func = getattr(self.platform, function_name)
+            func_args = list(signature(func).parameters.keys())
+
+            if not func_args or not 'driver' in func_spec:
+                return func(*args, **kwargs)
+            else:
+                args = args + (self,)
+                return func(*args, **kwargs)
+        return __missing
