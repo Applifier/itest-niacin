@@ -9,15 +9,11 @@ from os.path import exists
 from os import makedirs
 from inspect import signature
 from appium import webdriver
+from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException
-from appium.webdriver.webdriver import WebDriver
-
-# pylint: disable=C0301
-
-
 
 def get_capabilities(options=None):
     """
@@ -268,9 +264,9 @@ class iOS(PlatformBase):
                                                                                  err))
 
 class NiacinWebDriver(WebDriver):
-    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub',desired_capabilities=None, browser_profile=None, proxy=None,keep_alive=False):
+    def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False):
         print("initting Appium WebDriver..")
-        super().__init__(command_executor, desired_capabilities,browser_profile, proxy, keep_alive)
+        super().__init__(command_executor, desired_capabilities, browser_profile, proxy, keep_alive)
 
         platform = desired_capabilities['platformName']
         if platform.lower() == "ios":
@@ -285,15 +281,15 @@ class NiacinWebDriver(WebDriver):
             """
             Function to try to check does the function exists in
             the platform instance. If it does then we check does it take
-            WebDriver instance and inject NiacinWebDriver instance
-            into the passed args and return the function value
+            WebDriver instance and then we inject NiacinWebDriver instance
+            as the first element in args (whether there are args or not)
             """
             func = getattr(self.platform, function_name)
             func_args = list(signature(func).parameters.keys())
 
-            if not func_args or not 'driver' in func_spec:
-                return func(*args, **kwargs)
-            else:
-                args = args + (self,)
-                return func(*args, **kwargs)
+            if not args and "driver" in func_args:
+                args = args + (self, )
+            elif "driver" in func_args and not isinstance(self, type(args[0])):
+                args = (self, args)
+            return func(*args, **kwargs)
         return __missing
