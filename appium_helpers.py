@@ -7,7 +7,9 @@ from os import getcwd
 from os import environ
 from os.path import exists
 from os import makedirs
-from inspect import signature
+from sys import version_info
+if version_info[0] >= 3:
+    from inspect import signature
 from appium import webdriver
 from appium.webdriver.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -265,6 +267,11 @@ class iOS(PlatformBase):
 
 class NiacinWebDriver(WebDriver):
     def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False):
+
+        if version_info[0] < 3:
+            print("No support for python 2. Use python 3 instead..")
+            return
+
         print("initting Appium WebDriver..")
         super().__init__(command_executor, desired_capabilities, browser_profile, proxy, keep_alive)
 
