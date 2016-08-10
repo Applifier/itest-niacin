@@ -47,6 +47,8 @@ def get_capabilities_15(options=None):
         options = {}
     return {
         "app": environ.get("APPIUM_APPFILE") or options.get("app"),
+        "locale": environ.get("APPIUM_LOCALE") or options.get("locale"),
+        "fullReset": environ.get("APPIUM_FULLRESET") or options.get("fullReset"),
         "automationName": environ.get("APPIUM_AUTOMATION_15") or options.get("automationName", "Appium"),
         "udid": environ.get("IDEVICE_UDID") or options.get("udid", None),
         "deviceName": environ.get("APPIUM_DEVICE") or options.get("deviceName", "Local Device"),
