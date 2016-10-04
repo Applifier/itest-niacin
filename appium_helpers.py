@@ -63,6 +63,28 @@ def get_capabilities_15(options=None):
     }
 
 
+def get_capabilities_16(options=None):
+    """
+    Xcode8+, ios10+ only supports
+        'automationName' : 'XCUITest'
+    which is only supported in Appium1.6
+    """
+    if not options:
+        options = {}
+
+    return {
+        "automationName": "XCUITest",
+        "platformName": options.get("platformName"),
+        "browserName": None or options.get("browserName"),
+        "deviceName": options.get("deviceName"),
+        "app": options.get("app"),
+        "bundleId": options.get("bundleId"),
+        "udid": options.get("udid"),
+        "screenshotWaitTimeout": options.get("screenshotWaitTimeout", 3),
+        "defaultCommandTimeout": options.get("defaultCommandCommandTimeout", 500),
+    }
+
+
 def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities=None):
     """
     Get the Appium Driver
@@ -175,6 +197,14 @@ class iOS(PlatformBase):
                            wait_time)
 
     @staticmethod
+    def find_and_wait_button_xpath(driver, xpath, wait_time=5):
+        return iOS.wait_by(driver,
+                           EC.presence_of_element_located,
+                           By.XPATH,
+                           xpath,
+                           wait_time=5)
+
+    @staticmethod
     def find_all_webview_elements_by_xpath(driver):
         return driver.find_elements_by_xpath('//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAWebView[1]/*')
 
@@ -249,6 +279,17 @@ class iOS(PlatformBase):
             print("Error taking screenshot {} in {} with error {}".format(name, dir, err.output))
             return False
         return True
+
+    @staticmethod
+    def get_device_name():
+        """
+        Get attached device name
+        """
+        try:
+            return check_output(["idevicename"]).decode("utf-8").strip('\n')
+        except CalledProcessError as err:
+            print("Error getting device-name with error {}".format(err.output))
+        return False
 
     @staticmethod
     def install_package(package_path, udid=None):
