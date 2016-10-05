@@ -203,6 +203,9 @@ class Android(PlatformBase):
 class iOS(PlatformBase):
     def __init__(self, ios_driver='ui_automation', **options):
         super(iOS, self).__init__()
+        # @TODO: we need to divide the iOS class to 2 parts
+        #        one for the old <xcode8 <ios10 i.e. ui_automation and
+        #        the other for the new xcuitest for +xcode7 +ios10
         self.ios_driver = ios_driver
         print("IOS using the following ios strategy {}".format(self.ios_driver))
 
