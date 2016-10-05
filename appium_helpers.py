@@ -161,13 +161,51 @@ class PlatformBase(object):
             print("Will try to tap the element location w:{}, h:{}".format(w, h))
             return driver.tap([(w, h)])
 
+    @staticmethod
+    def find_all_elements_by_xpath(driver):
+        return driver.find_elements_by_xpath('//*[not(*)]')
+
+    @staticmethod
+    def find_and_wait_button_xpath(driver, xpath, wait_time=5):
+        return PlatformBase.wait_by(driver,
+                                    EC.presence_of_element_located,
+                                    By.XPATH,
+                                    xpath,
+                                    wait_time=5)
+
+    @staticmethod
+    def wait_by(driver, expected_condition, by_method, element_identifier, wait_time=5):
+        """
+        See: http://selenium-python.readthedocs.io/waits.html
+        Args:
+            driver: instance of Appium.webdriver
+            expected_condition: what we condition we expect to happen
+            by_method: by with what Appium.webdriver.method we try to find the element
+            element_identifier: depending on 'by_method' what indentifier we try
+            to use to locate the elem
+            wait_time: time to wait element to appear
+
+        Returns: instance of appium.webdriver.webelement or TimeoutException
+        """
+        return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
+
+    @staticmethod
+    def find_element_by_xpath(driver, xpath):
+        return driver.find_element_by_xpath(xpath)
+
 
 #### Android Keywords #####
 class Android(PlatformBase):
     pass
 
+
 #### iOS Keywords #####
 class iOS(PlatformBase):
+    def __init__(self, ios_driver='ui_automation', **options):
+        super(iOS, self).__init__()
+        self.ios_driver = ios_driver
+        print("IOS using the following ios strategy {}".format(self.ios_driver))
+
     @staticmethod
     def find_buttons(driver, name):
         s = '.elements()["{}"]'.format(name)
@@ -196,21 +234,10 @@ class iOS(PlatformBase):
                            s,
                            wait_time)
 
-    @staticmethod
-    def find_and_wait_button_xpath(driver, xpath, wait_time=5):
-        return iOS.wait_by(driver,
-                           EC.presence_of_element_located,
-                           By.XPATH,
-                           xpath,
-                           wait_time=5)
 
     @staticmethod
     def find_all_webview_elements_by_xpath(driver):
         return driver.find_elements_by_xpath('//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAWebView[1]/*')
-
-    @staticmethod
-    def find_element_by_xpath(driver, xpath):
-        return driver.find_element_by_xpath(xpath)
 
     @staticmethod
     def find_webview_elements_by_xpath(driver, xpath):
@@ -227,22 +254,6 @@ class iOS(PlatformBase):
     @staticmethod
     def find_all_window_elements(driver):
         return driver.find_elements_by_ios_uiautomation('.elements()')
-
-    @staticmethod
-    def wait_by(driver, expected_condition, by_method, element_identifier, wait_time=5):
-        """
-        See: http://selenium-python.readthedocs.io/waits.html
-        Args:
-            driver: instance of Appium.webdriver
-            expected_condition: what we condition we expect to happen
-            by_method: by with what Appium.webdriver.method we try to find the element
-            element_identifier: depending on 'by_method' what indentifier we try
-            to use to locate the elem
-            wait_time: time to wait element to appear
-
-        Returns: instance of appium.webdriver.webelement or TimeoutException
-        """
-        return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
 
     @staticmethod
     def toggle_orientation(driver):
