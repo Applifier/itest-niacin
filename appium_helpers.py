@@ -193,6 +193,14 @@ class PlatformBase(object):
     def find_element_by_xpath(driver, xpath):
         return driver.find_element_by_xpath(xpath)
 
+    @staticmethod
+    def toggle_orientation(driver):
+        current_orientation = driver.orientation
+        if current_orientation == "PORTRAIT":
+            driver.orientation = "LANDSCAPE"
+        else:
+            driver.orientation = "PORTRAIT"
+
 
 #### Android Keywords #####
 class Android(PlatformBase):
@@ -237,7 +245,6 @@ class iOS(PlatformBase):
                            s,
                            wait_time)
 
-
     @staticmethod
     def find_all_webview_elements_by_xpath(driver):
         return driver.find_elements_by_xpath('//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAWebView[1]/*')
@@ -257,14 +264,6 @@ class iOS(PlatformBase):
     @staticmethod
     def find_all_window_elements(driver):
         return driver.find_elements_by_ios_uiautomation('.elements()')
-
-    @staticmethod
-    def toggle_orientation(driver):
-        current_orientation = driver.orientation
-        if current_orientation == "PORTRAIT":
-            driver.orientation = "LANDSCAPE"
-        else:
-            driver.orientation = "PORTRAIT"
 
     @staticmethod
     def get_xml_tree(driver):
