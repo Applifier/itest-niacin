@@ -42,3 +42,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python/23728630#23728630
     """
     return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
+
+class UnittestRunException(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
