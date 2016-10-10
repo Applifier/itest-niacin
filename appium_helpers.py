@@ -63,6 +63,28 @@ def get_capabilities_15(options=None):
     }
 
 
+def get_capabilities_16(options=None):
+    """
+    Xcode8+, ios10+ only supports
+        'automationName' : 'XCUITest'
+    which is only supported in Appium1.6
+    """
+    if not options:
+        options = {}
+
+    return {
+        "automationName": "XCUITest",
+        "platformName": options.get("platformName"),
+        "browserName": None or options.get("browserName"),
+        "deviceName": options.get("deviceName"),
+        "app": options.get("app"),
+        "bundleId": options.get("bundleId"),
+        "udid": options.get("udid"),
+        "screenshotWaitTimeout": options.get("screenshotWaitTimeout", 3),
+        "defaultCommandTimeout": options.get("defaultCommandCommandTimeout", 500),
+    }
+
+
 def get_driver(driver=webdriver, addr='http://localhost:4723/wd/hub', capabilities=None):
     """
     Get the Appium Driver
@@ -139,13 +161,62 @@ class PlatformBase(object):
             print("Will try to tap the element location w:{}, h:{}".format(w, h))
             return driver.tap([(w, h)])
 
+    @staticmethod
+    def find_all_elements_by_xpath(driver):
+        return driver.find_elements_by_xpath('//*[not(*)]')
+
+    @staticmethod
+    def find_and_wait_button_xpath(driver, xpath, wait_time=5):
+        return PlatformBase.wait_by(driver,
+                                    EC.presence_of_element_located,
+                                    By.XPATH,
+                                    xpath,
+                                    wait_time=5)
+
+    @staticmethod
+    def wait_by(driver, expected_condition, by_method, element_identifier, wait_time=5):
+        """
+        See: http://selenium-python.readthedocs.io/waits.html
+        Args:
+            driver: instance of Appium.webdriver
+            expected_condition: what we condition we expect to happen
+            by_method: by with what Appium.webdriver.method we try to find the element
+            element_identifier: depending on 'by_method' what indentifier we try
+            to use to locate the elem
+            wait_time: time to wait element to appear
+
+        Returns: instance of appium.webdriver.webelement or TimeoutException
+        """
+        return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
+
+    @staticmethod
+    def find_element_by_xpath(driver, xpath):
+        return driver.find_element_by_xpath(xpath)
+
+    @staticmethod
+    def toggle_orientation(driver):
+        current_orientation = driver.orientation
+        if current_orientation == "PORTRAIT":
+            driver.orientation = "LANDSCAPE"
+        else:
+            driver.orientation = "PORTRAIT"
+
 
 #### Android Keywords #####
 class Android(PlatformBase):
     pass
 
+
 #### iOS Keywords #####
 class iOS(PlatformBase):
+    def __init__(self, ios_driver='ui_automation', **options):
+        super(iOS, self).__init__()
+        # @TODO: we need to divide the iOS class to 2 parts
+        #        one for the old <xcode8 <ios10 i.e. ui_automation and
+        #        the other for the new xcuitest for +xcode7 +ios10
+        self.ios_driver = ios_driver
+        print("IOS using the following ios strategy {}".format(self.ios_driver))
+
     @staticmethod
     def find_buttons(driver, name):
         s = '.elements()["{}"]'.format(name)
@@ -179,10 +250,6 @@ class iOS(PlatformBase):
         return driver.find_elements_by_xpath('//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAWebView[1]/*')
 
     @staticmethod
-    def find_element_by_xpath(driver, xpath):
-        return driver.find_element_by_xpath(xpath)
-
-    @staticmethod
     def find_webview_elements_by_xpath(driver, xpath):
         return driver.find_elements_by_xpath('//UIAApplication[1]/UIAWindow[1]/UIAScrollView[1]/UIAWebView[1]/' + xpath)
 
@@ -197,30 +264,6 @@ class iOS(PlatformBase):
     @staticmethod
     def find_all_window_elements(driver):
         return driver.find_elements_by_ios_uiautomation('.elements()')
-
-    @staticmethod
-    def wait_by(driver, expected_condition, by_method, element_identifier, wait_time=5):
-        """
-        See: http://selenium-python.readthedocs.io/waits.html
-        Args:
-            driver: instance of Appium.webdriver
-            expected_condition: what we condition we expect to happen
-            by_method: by with what Appium.webdriver.method we try to find the element
-            element_identifier: depending on 'by_method' what indentifier we try
-            to use to locate the elem
-            wait_time: time to wait element to appear
-
-        Returns: instance of appium.webdriver.webelement or TimeoutException
-        """
-        return WebDriverWait(driver, wait_time).until(expected_condition((by_method, element_identifier)))
-
-    @staticmethod
-    def toggle_orientation(driver):
-        current_orientation = driver.orientation
-        if current_orientation == "PORTRAIT":
-            driver.orientation = "LANDSCAPE"
-        else:
-            driver.orientation = "PORTRAIT"
 
     @staticmethod
     def get_xml_tree(driver):
@@ -249,6 +292,17 @@ class iOS(PlatformBase):
             print("Error taking screenshot {} in {} with error {}".format(name, dir, err.output))
             return False
         return True
+
+    @staticmethod
+    def get_device_name():
+        """
+        Get attached device name
+        """
+        try:
+            return check_output(["idevicename"]).decode("utf-8").strip('\n')
+        except CalledProcessError as err:
+            print("Error getting device-name with error {}".format(err.output))
+        return False
 
     @staticmethod
     def install_package(package_path, udid=None):
