@@ -174,6 +174,24 @@ class PlatformBase(object):
                                     wait_time=5)
 
     @staticmethod
+    def find_and_wait_button_name(driver, name, wait_time=5):
+        return PlatformBase.wait_by(driver,
+                                    EC.presence_of_element_located,
+                                    By.NAME,
+                                    name,
+                                    wait_time=5)
+    @staticmethod
+    def find_and_wait_button(driver, query, strategy, expectation=EC.presence_of_element_located, wait_time=5):
+        """
+        Find and wait element per query and strategy
+        """
+        return PlatformBase.wait_by(driver,
+                                    expectation,
+                                    strategy,
+                                    query,
+                                    wait_time)
+
+    @staticmethod
     def wait_by(driver, expected_condition, by_method, element_identifier, wait_time=5):
         """
         See: http://selenium-python.readthedocs.io/waits.html
@@ -228,7 +246,7 @@ class iOS(PlatformBase):
         return driver.find_element_by_ios_uiautomation(s)
 
     @staticmethod
-    def find_and_wait_button(driver, name, wait_time=5):
+    def find_and_wait_button_ios(driver, name, wait_time=5):
         s = '.elements()["{}"]'.format(name)
         return iOS.wait_by(driver,
                            EC.presence_of_element_located,
