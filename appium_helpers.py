@@ -323,6 +323,24 @@ class iOS(PlatformBase):
         return False
 
     @staticmethod
+    def uninstall_package(bundle_id, udid=None):
+        """
+        Uninstall app from the device using 'ideviceinstaller' with bundle-id
+        """
+        if not bundle_id:
+            print("missing bundle_id, cannot continue")
+            return False
+        if not udid:
+            udid = environ.get("IDEVICE_UDID") or iOS.get_udid()[-1]
+
+        try:
+            print("uninstalling {} from {}".format(bundle_id, udid))
+            check_output(["ideviceinstaller", "-u", str(udid), "-U", str(bundle_id)])
+            return True
+        except CalledProcessError as err:
+            print("Error uninstalling app {}, msg: {}".format(bundle_id, err))
+
+    @staticmethod
     def install_package(package_path, udid=None):
         """
         Install package to the device using 'ideviceinstaller'
@@ -334,6 +352,7 @@ class iOS(PlatformBase):
             return False
 
         try:
+            print("installing package {} in {}".format(package_path, udid))
             check_output(["ideviceinstaller", "-u", str(udid), "-i", package_path])
             return True
         except CalledProcessError as err:
