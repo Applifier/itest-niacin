@@ -320,7 +320,7 @@ class iOS(PlatformBase):
             return check_output(["idevicename"]).decode("utf-8").strip('\n')
         except CalledProcessError as err:
             print("Error getting device-name with error {}".format(err.output))
-        return False
+            return False
 
     @staticmethod
     def uninstall_package(bundle_id, udid=None):
@@ -336,9 +336,10 @@ class iOS(PlatformBase):
         try:
             print("uninstalling {} from {}".format(bundle_id, udid))
             check_output(["ideviceinstaller", "-u", str(udid), "-U", str(bundle_id)])
-            return True
+
         except CalledProcessError as err:
             print("Error uninstalling app {}, msg: {}".format(bundle_id, err))
+            return False
 
     @staticmethod
     def install_package(package_path, udid=None):
@@ -350,15 +351,13 @@ class iOS(PlatformBase):
         if not exists(package_path):
             print("Package '{}' doesn't exist".format(package_path))
             return False
-
         try:
             print("installing package {} in {}".format(package_path, udid))
             check_output(["ideviceinstaller", "-u", str(udid), "-i", package_path])
-            return True
         except CalledProcessError as err:
-            print("Error installing package to {} the device {}, msg: {}".format(package_path,
-                                                                                 udid,
-                                                                                 err))
+            print("Error installing package to {} the device {}, msg: {}".format(package_path, udid, err))
+            return False
+        return True
 
 class NiacinWebDriver(WebDriver):
     def __init__(self, command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=None, browser_profile=None, proxy=None, keep_alive=False):
