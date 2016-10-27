@@ -65,6 +65,8 @@ def catcher(*exceptions, msg=None):
         yield
     except exceptions as err:
         print("{}: '{}'".format(msg, err))
+        return False
+    return True
 
 
 class UnittestRunException(Exception):
