@@ -3,6 +3,8 @@ from inspect import stack
 from time import time
 import string
 import random
+from collections import defaultdict
+from contextlib import contextmanager
 
 
 def function_name():
@@ -42,6 +44,28 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python/23728630#23728630
     """
     return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
+
+
+@contextmanager
+def catcher(*exceptions, msg=None):
+    """
+    Context manager for catching exceptions and showing a msg
+    in case of an exception (msg can be omitted)
+
+    Usage:
+        def my_method():
+            with catcher(Exception, MyCustomException,..., msg="exception msg"):
+                method_that_might_raise_exception()
+                another_method_that_might_raise_MycustomException()
+                ..
+    """
+    if not msg: msg = "Exception raised"
+
+    try:
+        yield
+    except exceptions as err:
+        print("{}: '{}'".format(msg, err))
+
 
 class UnittestRunException(Exception):
     def __init__(self, *args, **kwargs):
