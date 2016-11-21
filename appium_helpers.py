@@ -179,7 +179,7 @@ class PlatformBase(object):
                                     EC.presence_of_element_located,
                                     By.NAME,
                                     name,
-                                    wait_time=5)
+                                    wait_time)
     @staticmethod
     def find_and_wait_button(driver, query, strategy, expectation=EC.presence_of_element_located, wait_time=5):
         """
