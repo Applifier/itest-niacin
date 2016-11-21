@@ -171,7 +171,7 @@ class PlatformBase(object):
                                     EC.presence_of_element_located,
                                     By.XPATH,
                                     xpath,
-                                    wait_time=5)
+                                    wait_time)
 
     @staticmethod
     def find_and_wait_button_name(driver, name, wait_time=5):
