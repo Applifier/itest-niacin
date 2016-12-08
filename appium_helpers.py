@@ -47,6 +47,7 @@ def get_capabilities_15(options=None):
         options = {}
     return {
         "app": environ.get("APPIUM_APPFILE") or options.get("app"),
+        "orientation": environ.get("APPIUM_ORIENTATION") or options.get("orientation"),
         "locale": environ.get("APPIUM_LOCALE") or options.get("locale"),
         "fullReset": environ.get("APPIUM_FULLRESET") or options.get("fullReset"),
         "automationName": environ.get("APPIUM_AUTOMATION_15") or options.get("automationName", "Appium"),
@@ -74,6 +75,7 @@ def get_capabilities_16(options=None):
 
     return {
         "automationName": "XCUITest",
+        "orientation": options.get("orientation"),
         "platformName": options.get("platformName"),
         "browserName": None or options.get("browserName"),
         "deviceName": options.get("deviceName"),
